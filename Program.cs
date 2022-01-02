@@ -21,7 +21,7 @@ namespace chess
     {
         public pieceType type {get;}
         public pieceColour colour {get;}
-        public piece(pieceType t, pieceColour c)
+        public piece(pieceColour c, pieceType t)
         {
             this.type = t;
             this.colour = c;
@@ -68,12 +68,49 @@ namespace chess
             return "?";
         }
     }
+
+    class board
+    {
+        piece[,] tiles;
+        public board ()
+        {
+            tiles = new piece[8,8];
+            // tiles[7,7] = new piece(pieceColour.White, pieceType.Knight);
+            
+        }
+
+        public string display()
+        {
+            string output = "";
+
+            for (int row=0; row < 8; row++)
+            {
+                for (int column=0; column < 8; column++)
+                {
+                    piece p = tiles[row,column];
+                    if (p == null)
+                    {
+                        output += " ";
+                    }
+                    else
+                    {
+                        output += p.name();
+                    }
+                }
+                output += "\n";
+            }
+
+            return output;
+        }
+    }
     class Program
     {
         static void Main(string[] args)
         {
-            piece x = new piece(pieceType.Queen, pieceColour.White);
-            Console.WriteLine(x.name());
+            piece x = new piece(pieceColour.White, pieceType.Queen);
+            board chess_board = new board();
+
+            Console.WriteLine(chess_board.display());
         }
     }
 }
