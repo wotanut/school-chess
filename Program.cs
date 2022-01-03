@@ -346,35 +346,71 @@ namespace chess
     {
         static void Main(string[] args)
         {
-            piece x = new piece(pieceColour.White, pieceType.Queen);
-            board chess_board = board.DefaultBoard();
-            // board chess_board = new board();
-            
-            chess_board.save("board.txt");
-            chess_board = board.load("board.txt");
+            board chess_board;
+            if (args.Length == 1)
+            {
+                Console.WriteLine("Reading from file " + args[0]);
+                chess_board = board.load(args[0]);
+            }
+            else
+            {
+                chess_board = board.DefaultBoard();
+            }
 
             // writes out the board
-
-            Console.WriteLine(chess_board.findPieces(pieceType.King,pieceColour.Black)[0]);
-
-            
-
             Console.WriteLine(chess_board);
 
-            Console.WriteLine(chess_board.getPieceAtLocation(new location(5,5)));
-            Console.WriteLine(chess_board.getNextPiece(new location(5,5),direction.North));
-            Console.WriteLine(chess_board.getNextPiece(new location(5,5),direction.NorthEast));
-            Console.WriteLine(chess_board.getNextPiece(new location(5,5),direction.East));
-            Console.WriteLine(chess_board.getNextPiece(new location(5,5),direction.SouthEast));
-            Console.WriteLine(chess_board.getNextPiece(new location(5,5),direction.South));
-            Console.WriteLine(chess_board.getNextPiece(new location(5,5),direction.SouthWest));
-            Console.WriteLine(chess_board.getNextPiece(new location(5,5),direction.West));
-            Console.WriteLine(chess_board.getNextPiece(new location(5,5),direction.NorthWest));
-            // Console.WriteLine(chess_board.getPieceAtLocation(new location(1,1)));
+            location black_king = chess_board.findPieces(pieceType.King,pieceColour.Black)[0].location;
 
-            // Console.WriteLine(chess_board);
-            // Console.WriteLine(new location(1,1).getNextLocation(direction.North));
+            piece p = checks(black_king,chess_board);
             
+            if (p == null)
+            {
+                Console.WriteLine("King is not in check");
+            }
+            else
+            {
+                Console.WriteLine("The king is in check");
+                Console.WriteLine(p.location);
+                Console.WriteLine(p);
+            }
+   
+        }
+        static piece checks(location black_king, board chess_board)
+        {
+            return
+            in_check_straight_line(black_king,chess_board.getNextPiece(black_king,direction.North)) ??
+            in_check_diagonal(black_king,chess_board.getNextPiece(black_king,direction.NorthEast)) ??
+            in_check_straight_line(black_king,chess_board.getNextPiece(black_king,direction.East)) ??
+            in_check_diagonal(black_king,chess_board.getNextPiece(black_king,direction.SouthEast)) ??
+            in_check_straight_line(black_king,chess_board.getNextPiece(black_king,direction.South)) ??
+            in_check_diagonal(black_king,chess_board.getNextPiece(black_king,direction.SouthWest)) ??
+            in_check_straight_line(black_king,chess_board.getNextPiece(black_king,direction.West)) ??
+            in_check_diagonal(black_king,chess_board.getNextPiece(black_king,direction.NorthWest));
+        }
+        static piece in_check_straight_line(location black_king, piece p)
+        {
+            if (p == null || p.colour == pieceColour.Black)
+            {
+                return null;
+            }
+            if (p.type == pieceType.Queen || p.type == pieceType.Rook)
+            {
+                return p;
+            }
+            return null;
+        }
+        static piece in_check_diagonal(location black_king, piece p)
+        {
+            if (p == null|| p.colour == pieceColour.Black)
+            {
+                return null;
+            }
+            if (p.type == pieceType.Queen || p.type == pieceType.Bishop)
+            {
+                return p;
+            }
+            return null;
         }
     }
 }

@@ -36,3 +36,6 @@ board
     - getPieceAtLocation
     - getNextPiece
     - ToString
+    - load
+    - save
+    - findPieces
