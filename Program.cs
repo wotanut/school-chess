@@ -5,6 +5,7 @@ using System.Collections.Generic;
 namespace chess
 {
 
+// some enums
     public enum direction
     {
         North,
@@ -34,10 +35,13 @@ namespace chess
 
     class location
     {
+
+        // location class so we can tell where the piece is on the board
         public int x {get;}
         public int y {get;}
         public location(int x, int y)
         {
+            // error handling
             if ( x < 1 || x > 8 || y < 1 || y > 8)
             {
                 throw new ArgumentException("Parameter out of range, both the X and Y value must be between 1 and 8 inclusive (X=" + x + "  Y=" + y + ")");
@@ -47,10 +51,13 @@ namespace chess
             this.y = y;
         }
 
+        // converts it to a human readable format (A3, B8, E4 etc)
         override public string ToString ()
         {
             return Convert.ToString(Convert.ToChar(this.x + 64)) + Convert.ToString(this.y);
         }
+
+        // get a new tile relative to the old one (N E S W NE SE SW NW)
         public location getNextLocation(direction d)
         {
             int dx = 0;
@@ -100,6 +107,7 @@ namespace chess
     }
     class piece
     {
+        // piece class
         public pieceType type {get;}
         public pieceColour colour {get;}
 
@@ -110,6 +118,7 @@ namespace chess
             this.colour = c;
         }
 
+         // converts a character to a piece
         public static piece charToPiece(char c)
         {
             switch (c)
@@ -159,9 +168,13 @@ namespace chess
             return null;
         }
 
+        // returns a piece type
+
         override public string ToString ()
         {
-            bool unicode = false;
+            bool unicode = false; // change this to true if you want to view the board in unicode characters
+
+            // black colours
             if (colour == pieceColour.Black)
             {
                 switch (type)
@@ -180,6 +193,8 @@ namespace chess
                         return unicode ? "♟": "P";
                 }
             }
+
+            // white colours
             else
             {
                 switch (type)
@@ -198,18 +213,24 @@ namespace chess
                         return unicode ? "♙": "p";
                 }
             }
+            // error handling
             throw new ArgumentException("Unkown piece");
         }
     }
 
     class board
     {
+        // board class
+
+        // create the 2d array
         piece[,] tiles;
         public board ()
         {
+            // load in the 2d array
             tiles = new piece[8,8];
         }
 
+        // a defualt board so you don't have to create a new one each time
         public static board DefaultBoard()
         {
             board b = new board();
@@ -251,11 +272,13 @@ namespace chess
             return b;
         }
 
+        // saves the board to a file
         public void save(string file)
         {
             File.WriteAllText(file,ToString());
         }
 
+        // loads a board from a file
         public static board load(string file)
         {
             board b = new board();
@@ -277,16 +300,20 @@ namespace chess
             return b;
         }
 
+        // adds a piece to the board in a specified location
         public void addToBoard(location l, piece p)
         {
             tiles[l.x -1 ,l.y -1] = p;
             p.location = l;
         }
+
+        // get informatino about a piece at that location
         public piece getPieceAtLocation(location l)
         {
             return tiles[l.x -1 ,l.y -1 ];
         }
 
+        // find all the pieces of any type or colour
         public List<piece> findPieces(pieceType type, pieceColour colour)
         {
             List<piece> pieces = new List<piece> ();
@@ -306,6 +333,7 @@ namespace chess
             return pieces;
         }
 
+        // get the next piece in any direction
         public piece getNextPiece(location l, direction d)
         {
             piece found = null;
@@ -318,6 +346,7 @@ namespace chess
             return found;
         }
 
+        // prints out the table
         override public string ToString()
         {
             string output = "";
@@ -346,6 +375,7 @@ namespace chess
     {
         static void Main(string[] args)
         {
+            // loads in the chess board if an argument is given (dotnet run board.txt)
             board chess_board;
             if (args.Length == 1)
             {
@@ -360,37 +390,59 @@ namespace chess
             // writes out the board
             Console.WriteLine(chess_board);
 
+            // find the black king and checks if it is in check
             location black_king = chess_board.findPieces(pieceType.King,pieceColour.Black)[0].location;
+            piece king = chess_board.getPieceAtLocation(black_king);
 
-            piece p = checks(black_king,chess_board);
+            piece p = checks(king,black_king,chess_board);
             
             if (p == null)
             {
-                Console.WriteLine("King is not in check");
+                Console.WriteLine("The black King is not in check");
             }
             else
             {
-                Console.WriteLine("The king is in check");
+                Console.WriteLine("The black king is in check");
+                Console.WriteLine(p.location);
+                Console.WriteLine(p);
+            }
+
+            // find the white king and checks if it is in check
+            location white_king = chess_board.findPieces(pieceType.King,pieceColour.White)[0].location;
+            king = chess_board.getPieceAtLocation(black_king);
+
+            p = checks(king,white_king,chess_board);
+            
+            if (p == null)
+            {
+                Console.WriteLine("The black King is not in check");
+            }
+            else
+            {
+                Console.WriteLine("The black king is in check");
                 Console.WriteLine(p.location);
                 Console.WriteLine(p);
             }
    
+   
         }
-        static piece checks(location black_king, board chess_board)
+        static piece checks(piece checKing,location king, board chess_board)
         {
+            // runs the functions to check all around it
             return
-            in_check_straight_line(black_king,chess_board.getNextPiece(black_king,direction.North)) ??
-            in_check_diagonal(black_king,chess_board.getNextPiece(black_king,direction.NorthEast)) ??
-            in_check_straight_line(black_king,chess_board.getNextPiece(black_king,direction.East)) ??
-            in_check_diagonal(black_king,chess_board.getNextPiece(black_king,direction.SouthEast)) ??
-            in_check_straight_line(black_king,chess_board.getNextPiece(black_king,direction.South)) ??
-            in_check_diagonal(black_king,chess_board.getNextPiece(black_king,direction.SouthWest)) ??
-            in_check_straight_line(black_king,chess_board.getNextPiece(black_king,direction.West)) ??
-            in_check_diagonal(black_king,chess_board.getNextPiece(black_king,direction.NorthWest));
+            in_check_straight_line(checKing, king,chess_board.getNextPiece(king,direction.North)) ??
+            in_check_diagonal(checKing, king,chess_board.getNextPiece(king,direction.NorthEast)) ??
+            in_check_straight_line(checKing, king,chess_board.getNextPiece(king,direction.East)) ??
+            in_check_diagonal(checKing, king,chess_board.getNextPiece(king,direction.SouthEast)) ??
+            in_check_straight_line(checKing, king,chess_board.getNextPiece(king,direction.South)) ??
+            in_check_diagonal(checKing, king,chess_board.getNextPiece(king,direction.SouthWest)) ??
+            in_check_straight_line(checKing, king,chess_board.getNextPiece(king,direction.West)) ??
+            in_check_diagonal(checKing, king,chess_board.getNextPiece(king,direction.NorthWest));
         }
-        static piece in_check_straight_line(location black_king, piece p)
+        static piece in_check_straight_line(piece checKing, location king, piece p)
         {
-            if (p == null || p.colour == pieceColour.Black)
+            // checks to see if any piece N S E or W can take it
+            if (p == null || p.colour == checKing.colour)
             {
                 return null;
             }
@@ -400,9 +452,10 @@ namespace chess
             }
             return null;
         }
-        static piece in_check_diagonal(location black_king, piece p)
+        static piece in_check_diagonal(piece checKing, location king, piece p)
         {
-            if (p == null|| p.colour == pieceColour.Black)
+            // checks to see if any piece NE SE SW or NW can take it
+            if (p == null|| p.colour == checKing.colour)
             {
                 return null;
             }

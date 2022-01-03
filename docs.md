@@ -26,7 +26,6 @@ piece
     - location
 - methods
     - ToString
-    - 
 
 board
 - fields
