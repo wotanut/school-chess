@@ -34,10 +34,6 @@ namespace chess
     {
         public int x {get;}
         public int y {get;}
-        override public string ToString ()
-        {
-            return Convert.ToString(Convert.ToChar(this.x + 64)) + Convert.ToString(this.y);
-        }
         public location(int x, int y)
         {
             if ( x < 1 || x > 8 || y < 1 || y > 8)
@@ -48,18 +44,71 @@ namespace chess
             this.x = x;
             this.y = y;
         }
+
+        override public string ToString ()
+        {
+            return Convert.ToString(Convert.ToChar(this.x + 64)) + Convert.ToString(this.y);
+        }
+        public location getNextLocation(direction d)
+        {
+            int dx = 0;
+            int dy = 0;
+            switch (d)
+            {
+                case direction.North:
+                    dy = 1;
+                    break;
+                case direction.NorthEast:
+                    dy = 1;
+                    dx = 1;
+                    break;
+                case direction.East:
+                    dx = 1;
+                    break;
+                case direction.SouthEast:
+                    dx = 1;
+                    dy = -1;
+                    break;
+                case direction.South:
+                    dx = -1;
+                    break;
+                case direction.SouthWest:
+                    dx = -1;
+                    dy = -1;
+                    break;
+                case direction.West:
+                    dy = -1;
+                    break;
+                case direction.NorthWest:
+                    dx = -1;
+                    dy = 1;
+                    break;
+            }
+            int newx = this.x + dx;
+            int newy = this.y + dy;
+            try
+            {
+                return new location(newx,newy);
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
     class piece
     {
         public pieceType type {get;}
         public pieceColour colour {get;}
+
+        public location location {get;}
         public piece(pieceColour c, pieceType t)
         {
             this.type = t;
             this.colour = c;
         }
 
-        public string name()
+        override public string ToString ()
         {
             if (colour == pieceColour.Black)
             {
@@ -97,7 +146,7 @@ namespace chess
                         return "♙";
                 }
             }
-            return "?";
+            throw new ArgumentException("Unkown piece");
         }
     }
 
@@ -107,45 +156,62 @@ namespace chess
         public board ()
         {
             tiles = new piece[8,8];
-            // tiles[7,7] = new piece(pieceColour.White, pieceType.Knight);
         }
 
-        public piece getNextPiece(direction d)
+        public static board DefaultBoard()
         {
-            int dx = 0;
-            int dy = 0;
-            switch (d)
+            board b = new board();
+
+            // generate two rows of pawns for each player
+            for (int i=0; i<8; i++)
             {
-                case direction.North:
-                    dy = 1;
-                    break;
-                case direction.NorthEast:
-                    dy = 1;
-                    dx = 1;
-                    break;
-                case direction.East:
-                    dx = 1;
-                    break;
-                case direction.SouthEast:
-                    dx = 1;
-                    dy = -1;
-                    break;
-                case direction.South:
-                    dx = -1;
-                    break;
-                case direction.SouthWest:
-                    dx = -1;
-                    dy = -1;
-                    break;
-                case direction.West:
-                    dy = -1;
-                    break;
-                case direction.NorthWest:
-                    dx = -1;
-                    dy = 1;
-                    break;
+                b.tiles[1,i] = new piece(pieceColour.White, pieceType.Pawn);
             }
-            return null;
+            for (int i=0; i<8; i++)
+            {
+                b.tiles[6,i] = new piece(pieceColour.Black, pieceType.Pawn);
+            }
+
+            // generates the rest of the white team
+
+            b.tiles[0,0] = new piece(pieceColour.White, pieceType.Rook);
+            b.tiles[0,1] = new piece(pieceColour.White, pieceType.Knight);
+            b.tiles[0,2] = new piece(pieceColour.White, pieceType.Bishop);
+            b.tiles[0,3] = new piece(pieceColour.White, pieceType.Queen);
+            b.tiles[0,4] = new piece(pieceColour.White, pieceType.King);
+            b.tiles[0,5] = new piece(pieceColour.White, pieceType.Bishop);
+            b.tiles[0,6] = new piece(pieceColour.White, pieceType.Knight);
+            b.tiles[0,7] = new piece(pieceColour.White, pieceType.Rook);
+
+            // generates the rest of the black team
+
+            b.tiles[7,0] = new piece(pieceColour.Black, pieceType.Rook);
+            b.tiles[7,1] = new piece(pieceColour.Black, pieceType.King);
+            b.tiles[7,2] = new piece(pieceColour.Black, pieceType.Bishop);
+            b.tiles[7,3] = new piece(pieceColour.Black, pieceType.Queen);
+            b.tiles[7,4] = new piece(pieceColour.Black, pieceType.King);
+            b.tiles[7,5] = new piece(pieceColour.Black, pieceType.Bishop);
+            b.tiles[7,6] = new piece(pieceColour.Black, pieceType.King);
+            b.tiles[7,7] = new piece(pieceColour.Black, pieceType.Rook);
+
+
+            return b;
+        }
+        public piece getPieceAtLocation(location l)
+        {
+            return tiles[l.x -1 ,l.y -1 ];
+        }
+
+        public piece getNextPiece(location l, direction d)
+        {
+            piece found = null;
+
+            while (found == null && (l = l.getNextLocation(d)) != null)
+            {
+                found = getPieceAtLocation(l);
+            }
+
+            return found;
         }
 
         override public string ToString()
@@ -163,7 +229,7 @@ namespace chess
                     }
                     else
                     {
-                        output += p.name();
+                        output += p.ToString();
                     }
                 }
                 output += "\n";
@@ -177,11 +243,13 @@ namespace chess
         static void Main(string[] args)
         {
             piece x = new piece(pieceColour.White, pieceType.Queen);
-            board chess_board = new board();
-            
+            board chess_board = board.DefaultBoard();
+
+            Console.WriteLine(chess_board.getPieceAtLocation(new location(1,1)));
 
             Console.WriteLine(chess_board);
-            Console.WriteLine(new location(1,1));
+            Console.WriteLine(new location(1,1).getNextLocation(direction.North));
+            
         }
     }
 }
