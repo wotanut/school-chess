@@ -1,4 +1,6 @@
 ﻿using System;
+using System.IO;
+using System.Collections.Generic;
 
 namespace chess
 {
@@ -70,14 +72,14 @@ namespace chess
                     dy = -1;
                     break;
                 case direction.South:
-                    dx = -1;
+                    dy = -1;
                     break;
                 case direction.SouthWest:
                     dx = -1;
                     dy = -1;
                     break;
                 case direction.West:
-                    dy = -1;
+                    dx = -1;
                     break;
                 case direction.NorthWest:
                     dx = -1;
@@ -101,31 +103,81 @@ namespace chess
         public pieceType type {get;}
         public pieceColour colour {get;}
 
-        public location location {get;}
+        public location location {get; set;}
         public piece(pieceColour c, pieceType t)
         {
             this.type = t;
             this.colour = c;
         }
 
+        public static piece charToPiece(char c)
+        {
+            switch (c)
+            {
+                // whites
+                case 'K':
+                case '♚':
+                    return new piece(pieceColour.Black,pieceType.King);
+                case 'Q':
+                case '♛':
+                    return new piece(pieceColour.Black,pieceType.Queen);
+                case 'B':
+                case '♝':
+                    return new piece(pieceColour.Black,pieceType.Bishop);
+                case 'N':
+                case '♞':
+                    return new piece(pieceColour.Black,pieceType.Knight);
+                case 'R':
+                case '♜':
+                    return new piece(pieceColour.Black,pieceType.Rook);
+                case 'P':
+                case '♟':
+                    return new piece(pieceColour.Black,pieceType.Pawn);
+
+                // blacks
+
+                case 'k':
+                case '♔':
+                    return new piece(pieceColour.White,pieceType.King);
+                case 'q':
+                case '♕':
+                    return new piece(pieceColour.White,pieceType.Queen);
+                case 'b':
+                case '♗':
+                    return new piece(pieceColour.White,pieceType.Bishop);
+                case 'n':
+                case '♘':
+                    return new piece(pieceColour.White,pieceType.Knight);
+                case 'r':
+                case '♖':
+                    return new piece(pieceColour.White,pieceType.Rook);
+                case 'p':
+                case '♙':
+                    return new piece(pieceColour.White,pieceType.Pawn);
+                
+            }
+            return null;
+        }
+
         override public string ToString ()
         {
+            bool unicode = false;
             if (colour == pieceColour.Black)
             {
                 switch (type)
                 {
                     case pieceType.King:
-                        return "♚";
+                        return unicode ? "♚": "K";
                     case pieceType.Queen:
-                        return "♛";
+                        return unicode ? "♛": "Q";
                     case pieceType.Bishop:
-                        return "♝";
+                        return unicode ? "♝": "B";
                     case pieceType.Knight:
-                        return "♞";
+                        return unicode ? "♞": "N";
                     case pieceType.Rook:
-                        return "♜";
+                        return unicode ? "♜": "R";
                     case pieceType.Pawn:
-                        return "♟︎";
+                        return unicode ? "♟": "P";
                 }
             }
             else
@@ -133,17 +185,17 @@ namespace chess
                 switch (type)
                 {
                     case pieceType.King:
-                        return "♔";
+                        return unicode ? "♔" : "k";
                     case pieceType.Queen:
-                        return "♕";
+                        return unicode ? "♕": "q";
                     case pieceType.Bishop:
-                        return "♗";
+                        return unicode ? "♗": "b";
                     case pieceType.Knight:
-                        return "♘";
+                        return unicode ? "♘": "n";
                     case pieceType.Rook:
-                        return "♖";
+                        return unicode ? "♖": "r";
                     case pieceType.Pawn:
-                        return "♙";
+                        return unicode ? "♙": "p";
                 }
             }
             throw new ArgumentException("Unkown piece");
@@ -163,43 +215,95 @@ namespace chess
             board b = new board();
 
             // generate two rows of pawns for each player
-            for (int i=0; i<8; i++)
+            for (int i=1; i<=8; i++)
             {
-                b.tiles[1,i] = new piece(pieceColour.White, pieceType.Pawn);
+                b.addToBoard(new location(i,2), new piece(pieceColour.White, pieceType.Pawn));
             }
-            for (int i=0; i<8; i++)
+            for (int i=1; i<=8; i++)
             {
-                b.tiles[6,i] = new piece(pieceColour.Black, pieceType.Pawn);
+                b.addToBoard(new location(i,7), new piece(pieceColour.Black, pieceType.Pawn));
             }
 
             // generates the rest of the white team
 
-            b.tiles[0,0] = new piece(pieceColour.White, pieceType.Rook);
-            b.tiles[0,1] = new piece(pieceColour.White, pieceType.Knight);
-            b.tiles[0,2] = new piece(pieceColour.White, pieceType.Bishop);
-            b.tiles[0,3] = new piece(pieceColour.White, pieceType.Queen);
-            b.tiles[0,4] = new piece(pieceColour.White, pieceType.King);
-            b.tiles[0,5] = new piece(pieceColour.White, pieceType.Bishop);
-            b.tiles[0,6] = new piece(pieceColour.White, pieceType.Knight);
-            b.tiles[0,7] = new piece(pieceColour.White, pieceType.Rook);
+
+            b.addToBoard(new location(1,1), new piece(pieceColour.White, pieceType.Rook));
+            b.addToBoard(new location(2,1), new piece(pieceColour.White, pieceType.Knight));
+            b.addToBoard(new location(3,1), new piece(pieceColour.White, pieceType.Bishop));
+            b.addToBoard(new location(4,1), new piece(pieceColour.White, pieceType.Queen));
+            b.addToBoard(new location(5,1), new piece(pieceColour.White, pieceType.King));
+            b.addToBoard(new location(6,1), new piece(pieceColour.White, pieceType.Bishop));
+            b.addToBoard(new location(7,1), new piece(pieceColour.White, pieceType.Knight));
+            b.addToBoard(new location(8,1), new piece(pieceColour.White, pieceType.Rook));
 
             // generates the rest of the black team
 
-            b.tiles[7,0] = new piece(pieceColour.Black, pieceType.Rook);
-            b.tiles[7,1] = new piece(pieceColour.Black, pieceType.King);
-            b.tiles[7,2] = new piece(pieceColour.Black, pieceType.Bishop);
-            b.tiles[7,3] = new piece(pieceColour.Black, pieceType.Queen);
-            b.tiles[7,4] = new piece(pieceColour.Black, pieceType.King);
-            b.tiles[7,5] = new piece(pieceColour.Black, pieceType.Bishop);
-            b.tiles[7,6] = new piece(pieceColour.Black, pieceType.King);
-            b.tiles[7,7] = new piece(pieceColour.Black, pieceType.Rook);
+            b.addToBoard(new location(1,8), new piece(pieceColour.Black, pieceType.Rook));
+            b.addToBoard(new location(2,8), new piece(pieceColour.Black, pieceType.Knight));
+            b.addToBoard(new location(3,8), new piece(pieceColour.Black, pieceType.Bishop));
+            b.addToBoard(new location(4,8), new piece(pieceColour.Black, pieceType.Queen));
+            b.addToBoard(new location(5,8), new piece(pieceColour.Black, pieceType.King));
+            b.addToBoard(new location(6,8), new piece(pieceColour.Black, pieceType.Bishop));
+            b.addToBoard(new location(7,8), new piece(pieceColour.Black, pieceType.Knight));
+            b.addToBoard(new location(8,8), new piece(pieceColour.Black, pieceType.Rook));
 
 
             return b;
         }
+
+        public void save(string file)
+        {
+            File.WriteAllText(file,ToString());
+        }
+
+        public static board load(string file)
+        {
+            board b = new board();
+            string[] lines = File.ReadAllLines(file);
+            for (int i=0; i<8; i++)
+            {
+                char[] characters = lines[i].ToCharArray();
+                int row = 8 - i;
+                for (int j=0; j<8; j++)
+                {
+                    char c = characters[j];
+                    piece p = piece.charToPiece(c);
+                    if (p !=null)
+                    {
+                        b.addToBoard(new location(j+1,row), p);
+                    }
+                }
+            }
+            return b;
+        }
+
+        public void addToBoard(location l, piece p)
+        {
+            tiles[l.x -1 ,l.y -1] = p;
+            p.location = l;
+        }
         public piece getPieceAtLocation(location l)
         {
             return tiles[l.x -1 ,l.y -1 ];
+        }
+
+        public List<piece> findPieces(pieceType type, pieceColour colour)
+        {
+            List<piece> pieces = new List<piece> ();
+
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    piece p = tiles[i,j];
+                    if (p != null && p.type == type && p.colour ==  colour)
+                    {
+                        pieces.Add(p);
+                    }
+                }
+            }
+
+            return pieces;
         }
 
         public piece getNextPiece(location l, direction d)
@@ -218,14 +322,14 @@ namespace chess
         {
             string output = "";
 
-            for (int row=0; row < 8; row++)
+            for (int row=7; row >= 0; row--)
             {
                 for (int column=0; column < 8; column++)
                 {
-                    piece p = tiles[row,column];
+                    piece p = tiles[column,row];
                     if (p == null)
                     {
-                        output += " ";
+                        output += "·"; // for better visual effects change this to a · to see the rest of the board better
                     }
                     else
                     {
@@ -244,11 +348,32 @@ namespace chess
         {
             piece x = new piece(pieceColour.White, pieceType.Queen);
             board chess_board = board.DefaultBoard();
+            // board chess_board = new board();
+            
+            chess_board.save("board.txt");
+            chess_board = board.load("board.txt");
 
-            Console.WriteLine(chess_board.getPieceAtLocation(new location(1,1)));
+            // writes out the board
+
+            Console.WriteLine(chess_board.findPieces(pieceType.King,pieceColour.Black)[0]);
+
+            
 
             Console.WriteLine(chess_board);
-            Console.WriteLine(new location(1,1).getNextLocation(direction.North));
+
+            Console.WriteLine(chess_board.getPieceAtLocation(new location(5,5)));
+            Console.WriteLine(chess_board.getNextPiece(new location(5,5),direction.North));
+            Console.WriteLine(chess_board.getNextPiece(new location(5,5),direction.NorthEast));
+            Console.WriteLine(chess_board.getNextPiece(new location(5,5),direction.East));
+            Console.WriteLine(chess_board.getNextPiece(new location(5,5),direction.SouthEast));
+            Console.WriteLine(chess_board.getNextPiece(new location(5,5),direction.South));
+            Console.WriteLine(chess_board.getNextPiece(new location(5,5),direction.SouthWest));
+            Console.WriteLine(chess_board.getNextPiece(new location(5,5),direction.West));
+            Console.WriteLine(chess_board.getNextPiece(new location(5,5),direction.NorthWest));
+            // Console.WriteLine(chess_board.getPieceAtLocation(new location(1,1)));
+
+            // Console.WriteLine(chess_board);
+            // Console.WriteLine(new location(1,1).getNextLocation(direction.North));
             
         }
     }
