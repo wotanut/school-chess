@@ -465,5 +465,22 @@ namespace chess
             }
             return null;
         }
+        static bool check_by_pawn(piece checKing, location king, piece p,board chess_board)
+        {
+            location location_1 = king.getNextLocation(direction.SouthWest);
+            location location_2 = king.getNextLocation(direction.SouthEast);
+            if (chess_board.getPieceAtLocation(location_1).type == pieceType.Pawn || chess_board.getPieceAtLocation(location_2).type == pieceType.Pawn)
+            {
+                if (chess_board.getPieceAtLocation(location_1).colour != checKing.colour || chess_board.getPieceAtLocation(location_2).colour != checKing.colour)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        static bool check_by_knight(piece checKing, location king, piece p,board chess_board)
+        {
+            return false;
+        }
     }
 }
