@@ -524,7 +524,7 @@ namespace chess
         }
         static piece check_by_knight(piece checKing, location king, piece p)
         {
-            if (p.type == pieceType.Rook)
+            if (p.type == pieceType.Knight)
             {
                 if (p.colour != checKing.colour)
                 {
