@@ -4,6 +4,7 @@ using System.Collections.Generic;
 
 namespace chess
 {
+
 // some enums
     public enum direction
     {
@@ -450,11 +451,11 @@ namespace chess
             
             if (p == null)
             {
-                Console.WriteLine("The white King is not in check");
+                Console.WriteLine("The black King is not in check");
             }
             else
             {
-                Console.WriteLine("The white king is in check");
+                Console.WriteLine("The black king is in check");
                 Console.WriteLine(p.location);
                 Console.WriteLine(p);
             }
@@ -479,8 +480,8 @@ namespace chess
             check_by_knight(checKing, king,chess_board.getNextPiece(king,direction.WestSouthWest)) ??
             in_check_straight_line(checKing, king,chess_board.getNextPiece(king,direction.West)) ??
             check_by_knight(checKing, king,chess_board.getNextPiece(king,direction.WestNorthWest)) ??
-            in_check_diagonal(checKing, king,chess_board.getNextPiece(king,direction.NorthWest));
-            check_by_knight(checKing, king,chess_board.getNextPiece(king,direction.NorthNorthWest)) ??
+            in_check_diagonal(checKing, king,chess_board.getNextPiece(king,direction.NorthWest)) ??
+            check_by_knight(checKing, king,chess_board.getNextPiece(king,direction.NorthNorthWest));
         }
         static piece in_check_straight_line(piece checKing, location king, piece p)
         {
