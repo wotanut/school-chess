@@ -9,13 +9,21 @@ namespace chess
     public enum direction
     {
         North,
+        NorthNorthEsat,
         NorthEast,
+        EastNorthEast,
         East,
+        EastSouthEast,
         SouthEast,
+        SouthSouthEast,
         South,
+        SouthSouthWest,
         SouthWest,
+        WestSouthWest,
         West,
+        WestNorthWest,
         NorthWest,
+        NorthNorthWest,
 
     }
     public enum pieceType
@@ -67,26 +75,54 @@ namespace chess
                 case direction.North:
                     dy = 1;
                     break;
+                case direction.NorthNorthEsat:
+                    dy = 2;
+                    dx = 1;
+                    break;
                 case direction.NorthEast:
                     dy = 1;
                     dx = 1;
                     break;
+                case direction.EastNorthEast:
+                    dy = 1;
+                    dx = 2;
+                    break;
                 case direction.East:
                     dx = 1;
+                    break;
+                case direction.EastSouthEast:
+                    dy = - 1;
+                    dx = 2;
                     break;
                 case direction.SouthEast:
                     dx = 1;
                     dy = -1;
                     break;
+                case direction.SouthSouthEast:
+                    dy = - 2;
+                    dx = 1;
+                    break;
                 case direction.South:
                     dy = -1;
+                    break;
+                case direction.SouthSouthWest:
+                    dy = -2;
+                    dx = -1;
                     break;
                 case direction.SouthWest:
                     dx = -1;
                     dy = -1;
                     break;
+                case direction.WestSouthWest:
+                    dy = -1;
+                    dx = -2;
+                    break;
                 case direction.West:
                     dx = -1;
+                    break;
+                case direction.WestNorthWest:
+                    dy = 1;
+                    dx = -2;
                     break;
                 case direction.NorthWest:
                     dx = -1;
@@ -431,13 +467,21 @@ namespace chess
             // runs the functions to check all around it
             return
             in_check_straight_line(checKing, king,chess_board.getNextPiece(king,direction.North)) ??
+            check_by_knight(checKing, king,chess_board.getNextPiece(king,direction.NorthNorthEsat)) ??
             in_check_diagonal(checKing, king,chess_board.getNextPiece(king,direction.NorthEast)) ??
+            check_by_knight(checKing, king,chess_board.getNextPiece(king,direction.EastNorthEast)) ??
             in_check_straight_line(checKing, king,chess_board.getNextPiece(king,direction.East)) ??
+            check_by_knight(checKing, king,chess_board.getNextPiece(king,direction.EastSouthEast)) ??
             in_check_diagonal(checKing, king,chess_board.getNextPiece(king,direction.SouthEast)) ??
+            check_by_knight(checKing, king,chess_board.getNextPiece(king,direction.SouthSouthEast)) ??
             in_check_straight_line(checKing, king,chess_board.getNextPiece(king,direction.South)) ??
+            check_by_knight(checKing, king,chess_board.getNextPiece(king,direction.SouthSouthWest)) ??
             in_check_diagonal(checKing, king,chess_board.getNextPiece(king,direction.SouthWest)) ??
+            check_by_knight(checKing, king,chess_board.getNextPiece(king,direction.WestSouthWest)) ??
             in_check_straight_line(checKing, king,chess_board.getNextPiece(king,direction.West)) ??
+            check_by_knight(checKing, king,chess_board.getNextPiece(king,direction.WestNorthWest)) ??
             in_check_diagonal(checKing, king,chess_board.getNextPiece(king,direction.NorthWest));
+            check_by_knight(checKing, king,chess_board.getNextPiece(king,direction.NorthNorthWest)) ??
         }
         static piece in_check_straight_line(piece checKing, location king, piece p)
         {
@@ -465,7 +509,7 @@ namespace chess
             }
             return null;
         }
-        static bool check_by_pawn(piece checKing, location king, piece p,board chess_board)
+        static piece check_by_pawn(piece checKing, location king, piece p,board chess_board)
         {
             location location_1 = king.getNextLocation(direction.SouthWest);
             location location_2 = king.getNextLocation(direction.SouthEast);
@@ -473,14 +517,21 @@ namespace chess
             {
                 if (chess_board.getPieceAtLocation(location_1).colour != checKing.colour || chess_board.getPieceAtLocation(location_2).colour != checKing.colour)
                 {
-                    return true;
+                    return chess_board.getPieceAtLocation(location_1);
                 }
             }
-            return false;
+            return null;
         }
-        static bool check_by_knight(piece checKing, location king, piece p,board chess_board)
+        static piece check_by_knight(piece checKing, location king, piece p)
         {
-            return false;
+            if (p.type == pieceType.Rook)
+            {
+                if (p.colour != checKing.colour)
+                {
+                    return p;
+                }
+            }
+            return null;
         }
     }
 }
