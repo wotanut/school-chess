@@ -4,7 +4,6 @@ using System.Collections.Generic;
 
 namespace chess
 {
-
 // some enums
     public enum direction
     {
@@ -451,11 +450,11 @@ namespace chess
             
             if (p == null)
             {
-                Console.WriteLine("The black King is not in check");
+                Console.WriteLine("The white King is not in check");
             }
             else
             {
-                Console.WriteLine("The black king is in check");
+                Console.WriteLine("The white king is in check");
                 Console.WriteLine(p.location);
                 Console.WriteLine(p);
             }

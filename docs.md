@@ -13,28 +13,28 @@
 
 location
 - fields
-    - x
-    - y
+    - + x
+    - + y
 - methods
-    - getNextLocation
-    - ToString
+    - + getNextLocation
+    - + ToString
 
 piece
 - fields
-    - type
-    - colour
-    - location
+    - + type
+    - + colour
+    - + location
 - methods
-    - ToString
+    - + ToString
 
 board
 - fields
-    - pieces
+    - + pieces
 - methods
-    - DefaultBoard
-    - getPieceAtLocation
-    - getNextPiece
-    - ToString
-    - load
-    - save
-    - findPieces
+    - + DefaultBoard
+    - + getPieceAtLocation
+    - + getNextPiece
+    - + ToString
+    - + load
+    - + save
+    - + findPieces
